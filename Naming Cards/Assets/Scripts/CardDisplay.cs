@@ -8,7 +8,7 @@ public class CardDisplay : MonoBehaviour {
    	public Card curCard;
    	public Image artwork;
    	public new Text name;
-	private bool isToShow;
+	public bool isToShow;
 	private RectTransform rectTrans;
 	private Vector3 posWithName;
 	private Vector2 originalShape;
