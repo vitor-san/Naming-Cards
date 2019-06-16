@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11f11912e7ef5a5469fa0985cc756dd7, type: 3}
-  m_Name: Wolf
+  m_Name: Man
   m_EditorClassIdentifier: 
-  figure: {fileID: 21300000, guid: 0c0dc3e6866970a4c9bbc480bac33263, type: 3}
-  name: wolf
+  figure: {fileID: 21300000, guid: aff17dc0845e2654c85dba747bf69647, type: 3}
+  name: man
   streak: 0
   delay: 0
+  seen: 0

@@ -6,6 +6,17 @@ using UnityEngine;
 public class Card : ScriptableObject {
 	public Sprite figure;
 	public new string name;
-	public int streak = 0;
-	public int delay = 0;
+	public int streak;
+	public int delay;
+	public bool seen;
+
+	public void Initialize() {
+		streak = 0;
+		delay = 0;
+		seen = false;
+	}
+
+	public void CalculateDelay() {
+		delay = streak+1;	//vai mudar
+	}
 }
