@@ -22,7 +22,11 @@ public class SceneChange : MonoBehaviour
     }
 
     public void Gallery() {
-        SceneManager.LoadScene("GalleryScene");
+        StartCoroutine(LoadGallery());
+    }
+
+    public void Options() {
+        StartCoroutine(LoadOptions());
     }
 
     private IEnumerator LoadGame() {
@@ -34,4 +38,25 @@ public class SceneChange : MonoBehaviour
         yield return new WaitForEndOfFrame();
         gameManager.StartGame();
     }
+
+    private IEnumerator LoadGallery() {
+        // Start loading the scene
+        AsyncOperation asyncLoadLevel = SceneManager.LoadSceneAsync("GalleryScene", LoadSceneMode.Single);
+        // Wait until the level finish loading
+        while (!asyncLoadLevel.isDone) yield return null;
+        // Wait a frame so every Awake and Start method is called
+        yield return new WaitForEndOfFrame();
+        gameManager.AssignBackButton();
+    }
+
+    private IEnumerator LoadOptions() {
+        // Start loading the scene
+        AsyncOperation asyncLoadLevel = SceneManager.LoadSceneAsync("OptionsScene", LoadSceneMode.Single);
+        // Wait until the level finish loading
+        while (!asyncLoadLevel.isDone) yield return null;
+        // Wait a frame so every Awake and Start method is called
+        yield return new WaitForEndOfFrame();
+        gameManager.AssignBackButton();
+    }
+
 }

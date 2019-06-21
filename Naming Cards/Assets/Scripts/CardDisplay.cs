@@ -21,6 +21,7 @@ public class CardDisplay : MonoBehaviour {
     
 	public void Show() {
 		artwork.sprite = curCard.figure;
+		artwork.color = Color.white;
         if (isToShow) {
         	name.text = curCard.name.ToLower();
 			rectTrans.anchoredPosition = posWithName;

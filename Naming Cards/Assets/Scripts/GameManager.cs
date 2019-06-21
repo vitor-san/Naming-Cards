@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour {
 	private Text iterator, endTitle, endScore;
 	private Slider showTimer, guessTimer;
 	private InputField inputField;
-	private Button goButton, stopButton, continueButton;
+	private Button goButton, stopButton, continueButton, backButton;
 	private CardDisplay cardUI;
 	private PriorityQueue cardsQueue;
 	public Card[] knowCards;
@@ -26,6 +26,25 @@ public class GameManager : MonoBehaviour {
 		DontDestroyOnLoad(this.gameObject);
 		GameObject sceneChangeObj = GameObject.Find("SceneChange");
 		sceneChange = sceneChangeObj.GetComponent<SceneChange>();
+
+		cardsQueue = new PriorityQueue();
+		//put all cards in the queue
+		Card[] cards = Resources.LoadAll("Cards", typeof(Card)).Cast<Card>().ToArray();
+		foreach (Card c in cards) {
+			c.Initialize();		//initializes the card streak, delay and seen with 0
+			cardsQueue.Enqueue(c);
+		}
+
+		knowCards = new Card[cardsQueue.Size()];
+	}
+
+	public void AssignBackButton() {
+		GameObject obj = GameObject.Find("BackButton");
+		backButton = obj.GetComponent<Button>();
+		backButton.onClick.RemoveAllListeners();
+		backButton.onClick.AddListener(delegate { 
+			sceneChange.MainMenu(); 
+		});
 	}
 
 	private void AssignAllReferences() {
@@ -82,16 +101,6 @@ public class GameManager : MonoBehaviour {
 
     public void StartGame() {
 		AssignAllReferences();
-    	cardsQueue = new PriorityQueue();
-		
-		//put all cards in a queue
-		Card[] cards = Resources.LoadAll("Cards", typeof(Card)).Cast<Card>().ToArray();
-		foreach (Card c in cards) {
-			c.Initialize();		//initializes the card streak, delay and seen with 0
-			cardsQueue.Enqueue(c);
-		}
-
-		knowCards = new Card[cardsQueue.Size()];
 
 		inputFieldObj.SetActive(false);
 		guessCounter.SetActive(false);
