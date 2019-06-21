@@ -9,6 +9,7 @@ public class Card : ScriptableObject {
 	public int streak;
 	public int delay;
 	public bool seen;
+	private int[] odds = {1, 3, 5, 7};
 
 	public void Initialize() {
 		streak = 0;
@@ -17,6 +18,6 @@ public class Card : ScriptableObject {
 	}
 
 	public void CalculateDelay() {
-		delay = streak+1;	//vai mudar
+		delay = odds[streak-1];
 	}
 }

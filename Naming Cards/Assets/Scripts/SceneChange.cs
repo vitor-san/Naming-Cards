@@ -6,11 +6,13 @@ using UnityEngine.SceneManagement;
 public class SceneChange : MonoBehaviour
 {
     private GameManager gameManager;
+    private GameSave gameSave;
 
     void Awake() {
 		DontDestroyOnLoad(this.gameObject);
         GameObject gameManagerObj = GameObject.Find("GameManager");
         gameManager = gameManagerObj.GetComponent<GameManager>();
+        gameSave = gameManagerObj.GetComponent<GameSave>();
 	}
 
     public void PlayGame() {
@@ -46,6 +48,7 @@ public class SceneChange : MonoBehaviour
     }
 
     public void ExitApp() {
+        gameSave.SaveGame();
         Application.Quit();
     }
 
