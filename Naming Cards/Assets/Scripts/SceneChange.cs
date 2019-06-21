@@ -21,6 +21,10 @@ public class SceneChange : MonoBehaviour
         SceneManager.LoadScene("MenuScene");
     }
 
+    public void Gallery() {
+        SceneManager.LoadScene("GalleryScene");
+    }
+
     private IEnumerator LoadGame() {
         // Start loading the scene
         AsyncOperation asyncLoadLevel = SceneManager.LoadSceneAsync("MainScene", LoadSceneMode.Single);

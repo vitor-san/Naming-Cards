@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour {
 	private Button goButton, stopButton, continueButton;
 	private CardDisplay cardUI;
 	private PriorityQueue cardsQueue;
+	public Card[] knowCards;
+	private int knowCardsCount = 0;
 	private const int maxNumCards = 10;
 	[SerializeField] private int numCardsThisRound = 5;
 	[SerializeField] private float delayAmount = 2.5f;	//for now, will be constant
@@ -89,6 +91,8 @@ public class GameManager : MonoBehaviour {
 			cardsQueue.Enqueue(c);
 		}
 
+		knowCards = new Card[cardsQueue.Size()];
+
 		inputFieldObj.SetActive(false);
 		guessCounter.SetActive(false);
 		roundEnd.SetActive(false);
@@ -127,18 +131,19 @@ public class GameManager : MonoBehaviour {
 
 	private IEnumerator NewGuessRound(Card[] curGame) {
 		int correctGuesses = 0;
-
-		//TODO: embaralhar
+		Shuffle(curGame);
 
 		foreach (Card c in curGame) {
 			cardUI.curCard = c;
 			cardUI.isToShow = false;
 			cardUI.Show();
 			inputField.text = "";
-			//perguntar a resposta
+
+			//pergunta a resposta
 			guessTimer.SetValueWithoutNotify(1);
 			StartCoroutine(CountTime(delayAmount*2, guessTimer));
 			yield return new WaitForSeconds(delayAmount*2 + 1);
+
 			if (answer == c.name.ToLower()) {	//faz a comparacao para ver se o jogador acertou
 				correctGuesses++;
 				c.streak++;
@@ -150,8 +155,11 @@ public class GameManager : MonoBehaviour {
 				c.delay = 0;
 				c.seen = false;
 			}
+
+			if (c.streak == 1) knowCards[knowCardsCount++] = c;
+			else cardsQueue.Enqueue(c);
+			
 			answer = "";
-			cardsQueue.Enqueue(c);
 		}
 
 		if (numCardsThisRound < maxNumCards) numCardsThisRound++;
@@ -165,6 +173,10 @@ public class GameManager : MonoBehaviour {
 			yield return null;
 			timer -= Time.deltaTime;
 		}
+	}
+
+	private void Shuffle(Card[] curGame) {
+
 	}
 
 	private void SetAnswer(string input) {

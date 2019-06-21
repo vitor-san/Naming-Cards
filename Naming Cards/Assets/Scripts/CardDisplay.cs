@@ -18,7 +18,8 @@ public class CardDisplay : MonoBehaviour {
 		posWithName = rectTrans.anchoredPosition;
 		originalShape = rectTrans.sizeDelta;
 	}
-    public void Show() {
+    
+	public void Show() {
 		artwork.sprite = curCard.figure;
         if (isToShow) {
         	name.text = curCard.name.ToLower();
@@ -31,4 +32,5 @@ public class CardDisplay : MonoBehaviour {
 			rectTrans.sizeDelta = new Vector2(originalShape.x * 1.1f, originalShape.y * 1.1f);
         }
     }
+	
 }

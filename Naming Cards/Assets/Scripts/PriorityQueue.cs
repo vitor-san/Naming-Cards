@@ -29,4 +29,8 @@ public class PriorityQueue {
             if (list[i].delay > 0) list[i].delay--;
         }
     }
+
+    public int Size() {
+        return list.Count;
+    }
 }
