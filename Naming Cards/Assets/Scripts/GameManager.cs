@@ -19,7 +19,8 @@ public class GameManager : MonoBehaviour {
 	private int knowCardsCount = 0;
 	private const int maxNumCards = 10;
 	[SerializeField] private int numCardsThisRound = 5;
-	[SerializeField] private float delayAmount = 2.5f;	//for now, will be constant
+	public float delayAmount = 2.5f;
+	public float respondDelay = 5f;
 	private string answer = "";
 
 	private void Awake() {
@@ -150,8 +151,8 @@ public class GameManager : MonoBehaviour {
 
 			//pergunta a resposta
 			guessTimer.SetValueWithoutNotify(1);
-			StartCoroutine(CountTime(delayAmount*2, guessTimer));
-			yield return new WaitForSeconds(delayAmount*2 + 1);
+			StartCoroutine(CountTime(respondDelay, guessTimer));
+			yield return new WaitForSeconds(respondDelay + 1);
 
 			if (answer == c.name.ToLower()) {	//faz a comparacao para ver se o jogador acertou
 				correctGuesses++;
