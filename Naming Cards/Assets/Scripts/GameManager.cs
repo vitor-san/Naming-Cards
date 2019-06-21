@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
+using UnityEngine.Audio;
 
 public class GameManager : MonoBehaviour {
 
@@ -16,6 +17,8 @@ public class GameManager : MonoBehaviour {
 	private CardDisplay cardUI;
 	private PriorityQueue cardsQueue;
 	public Card[] knowCards;
+	public AudioSource audio;
+	public AudioMixer audioMixer;
 	private int knowCardsCount = 0;
 	private const int maxNumCards = 10;
 	[SerializeField] private int numCardsThisRound = 5;
@@ -25,6 +28,7 @@ public class GameManager : MonoBehaviour {
 
 	private void Awake() {
 		DontDestroyOnLoad(this.gameObject);
+		DontDestroyOnLoad(audio);
 		GameObject sceneChangeObj = GameObject.Find("SceneChange");
 		sceneChange = sceneChangeObj.GetComponent<SceneChange>();
 
@@ -155,6 +159,11 @@ public class GameManager : MonoBehaviour {
 			yield return new WaitForSeconds(answerDelay + 1);
 
 			if (answer == c.name.ToLower()) {	//faz a comparacao para ver se o jogador acertou
+				Card[] cards = Resources.LoadAll("Cards", typeof(Card)).Cast<Card>().ToArray();
+				
+				float volume;
+				bool gotVolume = audioMixer.GetFloat("volume", out volume);
+				audio.PlayOneShot(audio.clip, volume);
 				correctGuesses++;
 				c.streak++;
 				c.seen = true;
