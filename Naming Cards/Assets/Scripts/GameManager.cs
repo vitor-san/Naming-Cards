@@ -19,8 +19,8 @@ public class GameManager : MonoBehaviour {
 	private int knowCardsCount = 0;
 	private const int maxNumCards = 10;
 	[SerializeField] private int numCardsThisRound = 5;
-	public float delayAmount = 2.5f;
-	public float respondDelay = 5f;
+	public float learnDelay = 2.5f;
+	public float answerDelay = 5f;
 	private string answer = "";
 
 	private void Awake() {
@@ -128,8 +128,8 @@ public class GameManager : MonoBehaviour {
 			else cardUI.isToShow = false;
 			cardUI.Show();
 			showTimer.SetValueWithoutNotify(1);
-			StartCoroutine(CountTime(delayAmount, showTimer));
-			yield return new WaitForSeconds(delayAmount + 1);
+			StartCoroutine(CountTime(learnDelay, showTimer));
+			yield return new WaitForSeconds(learnDelay + 1);
 		}
 
 		showCounter.SetActive(false);
@@ -151,8 +151,8 @@ public class GameManager : MonoBehaviour {
 
 			//pergunta a resposta
 			guessTimer.SetValueWithoutNotify(1);
-			StartCoroutine(CountTime(respondDelay, guessTimer));
-			yield return new WaitForSeconds(respondDelay + 1);
+			StartCoroutine(CountTime(answerDelay, guessTimer));
+			yield return new WaitForSeconds(answerDelay + 1);
 
 			if (answer == c.name.ToLower()) {	//faz a comparacao para ver se o jogador acertou
 				correctGuesses++;
