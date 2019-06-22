@@ -19,31 +19,40 @@ public class GameManager : MonoBehaviour {
 	public Card[] knowCards;
 	private int knowCardsCount = 0;
 	private const int maxNumCards = 10;
-	[SerializeField] private int numCardsThisRound = 5;
+	[SerializeField] private int numCardsThisRound = 5;	//"Serialize Field" makes Unity show the attribute in the inspector, even if it's private
 	public float learnDelay = 2.5f;
 	public float answerDelay = 5f;
 	private string answer = "";
 
+	/*
+		Awake() method is called when the object is
+		instantiated for the first time.
+	 */
 	private void Awake() {
-		DontDestroyOnLoad(this.gameObject);
+		DontDestroyOnLoad(this.gameObject);	//the game object in which this script is attached to (i.e. the Game Manager itself) will persist between scenes (i.e. only one instance of it will be created, which will help to control the game batter)
 		GameObject sceneChangeObj = GameObject.Find("SceneChange");
 		sceneChange = sceneChangeObj.GetComponent<SceneChange>();
 		gameSaver = this.gameObject.GetComponent<GameSave>();
 		cardsQueue = new PriorityQueue();
 
-		if (true || !gameSaver.LoadGame()) {
-			//put all cards in the queue
-			Card[] cards = Resources.LoadAll("Cards", typeof(Card)).Cast<Card>().ToArray();
+		if (true || !gameSaver.LoadGame()) {	//if the game is being runned for the first time (here, the first condition of the if statement was set to not call the second one, because it's not done yet and would cause the game to crash)
+			Card[] cards = Resources.LoadAll("Cards", typeof(Card)).Cast<Card>().ToArray();	//load all cards from "Resources" folder
 			Shuffle(cards);
+			//put all cards in the queue
 			foreach (Card c in cards) {
 				c.Initialize();		//initializes the card streak, delay and seen with 0
 				cardsQueue.Enqueue(c);
 			}
 
-			knowCards = new Card[cardsQueue.Size()];	
+			knowCards = new Card[cardsQueue.Size()];	//instantiates the array of know cards (which will start empty)	
 		}
 	}
 
+	/*
+		Finds "BackButton" on current scene and adds to
+		it the method to go back to the main menu when
+		pressed.
+	 */
 	public void AssignBackButton() {
 		GameObject obj = GameObject.Find("BackButton");
 		backButton = obj.GetComponent<Button>();
@@ -53,9 +62,14 @@ public class GameManager : MonoBehaviour {
 		});
 	}
 
+	/*
+		Assigns all references of objects/components
+		in the scene to their respective representatives 
+		on this class attributes.
+	 */
 	private void AssignAllReferences() {
-		GameObject obj;	// a generic game object
-		//assign each respective reference to all game objects/components of this class
+		GameObject obj;	//a generic game object
+		
 		obj = GameObject.Find("Iterator");
 		iterator = obj.GetComponent<Text>();
 
@@ -105,37 +119,64 @@ public class GameManager : MonoBehaviour {
 		readyGo = GameObject.Find("DarkerPanel");
 	}
 
+	/*
+		Method to be called when the GameManager 
+		enters the MainScene scene.
+	 */
     public void StartGame() {
 		AssignAllReferences();
 
 		inputFieldObj.SetActive(false);
 		guessCounter.SetActive(false);
 		roundEnd.SetActive(false);
-    	Time.timeScale = 0f;
+    	Time.timeScale = 0f;	//first, the user have to press the button "Bora!", and this line of code will impede the game to keep running on background until that happens
     }
 
+	/*
+		When the player press the "Bora!" button, the game 
+		will come out from it's frozen state and time will 
+		start playing normally.
+	 */
 	private void UnlockGame() {
 		Time.timeScale = 1f;
 		readyGo.SetActive(false);
 		StartCoroutine(NewShowRound(numCardsThisRound));
 	}
 
+	/*
+		Coroutine that shows a specific number of cards to
+		the player, giving to him a time to memorize their
+		names.
+
+		Parameter:
+			int numCards - number of cards to be shown this
+			round
+	 */
 	private IEnumerator NewShowRound(int numCards) {
-		Card[] curGame = new Card[numCards];
-		for (int i = 0; i < numCards; i++) curGame[i] = cardsQueue.Dequeue();
+		Card[] curGame = new Card[numCards];	//instantiates a new array of cards
+		for (int i = 0; i < numCards; i++) curGame[i] = cardsQueue.Dequeue();	//pops from queue the number of cards to be used in this round
 
 		int numShowed = 0;
 		foreach (Card c in curGame) {
 			if (c == null) break;
 			numShowed++;
-			iterator.text = numShowed + "/" + numCardsThisRound;
+			iterator.text = numShowed + "/" + numCardsThisRound;	//updates the counter of how many cards have been shown this round
 			cardUI.curCard = c;
-			if (!c.seen) cardUI.isToShow = true;
-			else cardUI.isToShow = false;
+
+			float delay;
+			if (!c.seen) {
+				cardUI.isToShow = true;
+				delay = learnDelay;
+			}
+			else {
+				cardUI.isToShow = false;
+				delay = learnDelay/2;
+			}
+
 			cardUI.Show();
-			showTimer.SetValueWithoutNotify(1);
-			StartCoroutine(CountTime(learnDelay, showTimer));
-			yield return new WaitForSeconds(learnDelay + 1);
+			showTimer.SetValueWithoutNotify(1);	//fill slider's time counter to max
+			StartCoroutine(CountTime(delay, showTimer));
+			yield return new WaitForSeconds(delay + 0.5f);	//waits for a time (the time to deplete slider's time counter) before going to the next card
 		}
 
 		showCounter.SetActive(false);
@@ -145,6 +186,15 @@ public class GameManager : MonoBehaviour {
 		StartCoroutine(NewGuessRound(curGame));
 	}
 
+	/*
+		Coroutine that starts the guessing round, in which
+		the player will try to remember and hit the name of
+		the cards that were shown to him in the learn round.
+
+		Parameter:
+			Card[] curGame - the game formed by previous show
+			round
+	 */
 	private IEnumerator NewGuessRound(Card[] curGame) {
 		int correctGuesses = 0;
 		Shuffle(curGame);
@@ -155,12 +205,13 @@ public class GameManager : MonoBehaviour {
 			cardUI.Show();
 			inputField.text = "";
 
-			//pergunta a resposta
-			guessTimer.SetValueWithoutNotify(1);
+			//asks the answer
+			guessTimer.SetValueWithoutNotify(1);	//fill slider's time counter to max
 			StartCoroutine(CountTime(answerDelay, guessTimer));
-			yield return new WaitForSeconds(answerDelay + 1);
+			yield return new WaitForSeconds(answerDelay + 0.5f);	//waits for a time (the time to deplete slider's time counter) before proceeding
 
-			if (answer == c.name.ToLower()) {	//faz a comparacao para ver se o jogador acertou
+			//validates answer
+			if (answer == c.name.ToLower()) {
 				correctGuesses++;
 				c.streak++;
 				c.seen = true;
@@ -172,7 +223,7 @@ public class GameManager : MonoBehaviour {
 				c.seen = false;
 			}
 
-			if (c.streak == 4) knowCards[knowCardsCount++] = c;
+			if (c.streak == 3) knowCards[knowCardsCount++] = c;	//if the player has guessed the card x times in a row, he dominated it, so it goes to his gallery instead of back in the queue (sorta like a trophy)
 			else cardsQueue.Enqueue(c);
 			
 			answer = "";
@@ -182,15 +233,29 @@ public class GameManager : MonoBehaviour {
 		ResultScreen(correctGuesses);
 	}
 
+	/*
+		Coroutine that depletes a slider's time counter. 
+
+		Parameters:
+			float initialTime - total time of the counter
+			Slider slider - slider to be modified
+	 */
 	private IEnumerator CountTime(float initialTime, Slider slider) {
 		float timer = initialTime;
 		while (timer >= 0) {
-			slider.SetValueWithoutNotify(timer/initialTime);
+			slider.SetValueWithoutNotify(timer/initialTime);	//sets time counter to a percent of the initial time
 			yield return null;
-			timer -= Time.deltaTime;
+			timer -= Time.deltaTime;	//decreases time
 		}
 	}
 
+	/*
+		Shuffles an array of Cards.
+
+		Parameter:
+			Card[] cards - array to be
+			shuffled
+	 */
 	private void Shuffle(Card[] cards) {
 		Card temp;
 		for (int i = 0; i < cards.Length; i++) {
@@ -201,18 +266,33 @@ public class GameManager : MonoBehaviour {
         }
 	}
 
+	/*
+		Method to be used as the event triggered when 
+		the Input Field has an answer submitted to it.
+
+		Parameter:
+			string input - input got from the user
+	 */
 	private void SetAnswer(string input) {
 		answer = input.ToLower();
 	}
 
+	/*
+		Show the final result of the round and asks
+		the player if he wants to continue or not.
+
+		Parameter:
+			int numHits - number of cards guessed
+			correctly by the end of this round
+	 */
 	private void ResultScreen(int numHits) {
 		inputFieldObj.SetActive(false);
 		guessCounter.SetActive(false);
 		roundEnd.SetActive(true);
 
-		if (numHits >= Mathf.Ceil(numCardsThisRound/2f)) {
+		if (numHits >= Mathf.Ceil(numCardsThisRound/2f)) {	//if the player hit more than a half of the cards...
 			endTitle.text = "Parabéns!";
-			if (answerDelay > learnDelay) answerDelay -= 0.2f;
+			if (answerDelay > learnDelay) answerDelay -= 0.3f;	//decreases answer time (improving game dificulty)
 		}
 		else {
 			endTitle.text = "Que pena!";
@@ -223,6 +303,9 @@ public class GameManager : MonoBehaviour {
 		else endScore.text = "Você acertou " + numHits + " cartas";
 	}
 
+	/*
+		Method to begin a new round.
+	 */
 	private void Continue() {
 		showCounter.SetActive(true);
 		iterator.enabled = true;

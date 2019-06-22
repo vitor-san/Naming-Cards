@@ -9,18 +9,45 @@ public class GameSave : MonoBehaviour {
 
     private string dir;
 
+    /*
+		Awake() method is called when the object is
+		instantiated for the first time.
+	 */
     void Awake() {
-        dir = Application.persistentDataPath;
+        dir = Application.persistentDataPath;   //saves the path that will be used to store game info
     }
 
+    /*
+        Checks whether the "gameSave" directory exists.
+
+        Return:
+            bool - result of the search
+     */
     public bool SaveDirExists() {
         return Directory.Exists(dir + "/gameSave");
     }
 
+    /*
+        Checks whether the parameter file exists on
+        the "gameSave" directory.
+
+        Parameter:
+            string file - name of the file (including
+            extension) to be cheched
+
+        Return:
+            bool - result of the search
+     */
     public bool FileExists(string file) {
         return File.Exists(dir + "/gameSave/" + file);
     }
 
+    /*
+        Saves the current game state, such as which cards
+        the player has in his gallery, which ones are in
+        the queue and how many cards have to be shown to
+        the player in the next round.
+     */
     public void SaveGame() {
 
         PriorityQueueJSON jsonQueue = new PriorityQueueJSON();
@@ -44,6 +71,13 @@ public class GameSave : MonoBehaviour {
         file.Close();
     }
 
+    /*
+        Loads the player's game progress.
+
+        Return:
+            bool - whether the load was
+            successful or not
+     */
     public bool LoadGame() {
         if (SaveDirExists()) {
             PriorityQueue cardsQueue = this.gameObject.GetComponent<GameManager>().cardsQueue;

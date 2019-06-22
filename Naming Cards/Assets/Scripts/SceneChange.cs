@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneChange : MonoBehaviour
-{
+public class SceneChange : MonoBehaviour {
+    
     private GameManager gameManager;
     private GameSave gameSave;
 
+    /*
+		Awake() method is called when the object is
+		instantiated for the first time.
+	 */
     void Awake() {
-		DontDestroyOnLoad(this.gameObject);
+		DontDestroyOnLoad(this.gameObject); //the object in which this script is attached will persist between scenes
         GameObject gameManagerObj = GameObject.Find("GameManager");
         gameManager = gameManagerObj.GetComponent<GameManager>();
         gameSave = gameManagerObj.GetComponent<GameSave>();
@@ -28,21 +32,21 @@ public class SceneChange : MonoBehaviour
     }
 
     private IEnumerator LoadGame() {
-        // Start loading the scene
+        //start loading the scene
         AsyncOperation asyncLoadLevel = SceneManager.LoadSceneAsync("MainScene", LoadSceneMode.Single);
-        // Wait until the level finish loading
+        //wait until the level finish loading
         while (!asyncLoadLevel.isDone) yield return null;
-        // Wait a frame so every Awake and Start method is called
+        //wait a frame so every Awake and Start method is called
         yield return new WaitForEndOfFrame();
         gameManager.StartGame();
     }
 
     private IEnumerator LoadGallery() {
-        // Start loading the scene
+        //start loading the scene
         AsyncOperation asyncLoadLevel = SceneManager.LoadSceneAsync("GalleryScene", LoadSceneMode.Single);
-        // Wait until the level finish loading
+        //wait until the level finish loading
         while (!asyncLoadLevel.isDone) yield return null;
-        // Wait a frame so every Awake and Start method is called
+        //wait a frame so every Awake and Start method is called
         yield return new WaitForEndOfFrame();
         gameManager.AssignBackButton();
     }
