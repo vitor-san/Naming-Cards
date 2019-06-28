@@ -223,7 +223,7 @@ public class GameManager : MonoBehaviour {
 				c.seen = false;
 			}
 
-			if (c.streak == 3) knowCards[knowCardsCount++] = c;	//if the player has guessed the card x times in a row, he dominated it, so it goes to his gallery instead of back in the queue (sorta like a trophy)
+			if (c.streak == 1) knowCards[knowCardsCount++] = c;	//if the player has guessed the card x times in a row, he dominated it, so it goes to his gallery instead of back in the queue (sorta like a trophy)
 			else cardsQueue.Enqueue(c);
 			
 			answer = "";
